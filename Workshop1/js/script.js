@@ -98,6 +98,7 @@ $(function () {
         document.getElementById("book_total").innerHTML = $("#book_price").val() * $("#book_amount").val();
     }
 
+
     //日期    
     $("#bought_datepicker").kendoDatePicker({
         parseFormats: ["yyyyMMdd", "yyyy/MM/dd", "yyyy-MM-dd"],

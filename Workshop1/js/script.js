@@ -1,6 +1,7 @@
 var bookDataFromLocalStorage = [];
-// 載入書籍資料
 
+
+// 載入資料
 function loadBookData() {
     bookDataFromLocalStorage = JSON.parse(localStorage.getItem('bookData'));
     if (bookDataFromLocalStorage == null) {
@@ -10,22 +11,22 @@ function loadBookData() {
     Grid(bookDataFromLocalStorage);
 }
 
-//將資料放入grid內
+
 function Grid(data) {
     $("#book_grid").kendoGrid({
-        dataSource: {//資料來源
+        dataSource: {   //資料
             type: "odata",
             data: data,
             pageSize: 20,
         },
         height: 550,
-        toolbar: kendo.template($("#template").html()), //查詢textbox
-        pageable: {//分頁選單
+        toolbar: kendo.template($("#template").html()),    //查textbox
+        pageable: {   //分頁
             input: true,
             numeric: false
         },
         columns: [
-            {command: [//刪除按紐
+            {command: [  //delete button
                     {name: "刪除", click: function (e) {
                             e.preventDefault();
                             var tr = $(e.target).closest("tr");
@@ -64,15 +65,16 @@ function Grid(data) {
 }
 
 $(function () {
-//載入loadBookData資料
+    //載入loadBookData
     loadBookData();
-//中文設定
     kendo.culture("zh-TW");
-//建立的視窗
+
+    //建立視窗
     $(add_book).click(function () {
         $("#window").data("kendoWindow").center().open();
     });
-//建立視窗本體
+
+    //建立視窗本體
     $("#window").kendoWindow({
         width: "600px",
         title: "新增書籍",
@@ -84,7 +86,8 @@ $(function () {
             "Close"
         ],
     });
-//金額跟數量上升下降控制
+
+    //金額跟數量上升下降
     $("#book_price").kendoNumericTextBox({
         spin: onSpin
     });
@@ -94,7 +97,8 @@ $(function () {
     function onSpin() {
         document.getElementById("book_total").innerHTML = $("#book_price").val() * $("#book_amount").val();
     }
-//日期    
+
+    //日期    
     $("#bought_datepicker").kendoDatePicker({
         parseFormats: ["yyyyMMdd", "yyyy/MM/dd", "yyyy-MM-dd"],
         value: new Date(),
@@ -106,7 +110,8 @@ $(function () {
         min: new Date($("#bought_datepicker").val()),
         format: "yyyy-MM-dd"
     });
-//下拉是選單與換圖片
+
+    //下拉式選單
     var viewModel = kendo.observable({
         imageSrc: null,
         bookCategoryList: [
@@ -117,33 +122,38 @@ $(function () {
             {name: "語言", url: "image/language.jpg"},
         ]
     });
+
+    //換圖片
     viewModel.imageSrc = viewModel.bookCategoryList[0].url;
     kendo.bind($("#window"), viewModel);
     var validator = $("#book_form").kendoValidator().data("kendoValidator");
 
-//查詢
-function find(str) {
-    bookDataInquire = [];
-    //空值顯示所有資料
-    if (str == "") {
-        bookDataInquire = JSON.parse(localStorage.getItem('bookData'));
-    } else {
-        bookDataFromLocalStorage = JSON.parse(localStorage.getItem('bookData'));
-        for (var i = 0, max = bookDataFromLocalStorage.length; i < max; i++) {
-            if (bookDataFromLocalStorage[i].BookName == str || bookDataFromLocalStorage[i].BookAuthor == str) {
-                bookDataInquire.push(bookDataFromLocalStorage[i]);
+
+    //find
+    function find(str) {
+        bookDataInquire = [];
+        //空值
+        if (str == "") {
+            bookDataInquire = JSON.parse(localStorage.getItem('bookData'));
+        } else {
+            bookDataFromLocalStorage = JSON.parse(localStorage.getItem('bookData'));
+            for (var i = 0, max = bookDataFromLocalStorage.length; i < max; i++) {
+                if (bookDataFromLocalStorage[i].BookName == str || bookDataFromLocalStorage[i].BookAuthor == str) {
+                    bookDataInquire.push(bookDataFromLocalStorage[i]);
+                }
             }
         }
+
+        Grid(bookDataInquire);
     }
-    Grid(bookDataInquire);
-}
-//新增
+
+    //insert
     $(save_book).click(function () {
-        if (validator.validate()) {//條件為所有欄位都符合標準
-            bookDataFromLocalStorage = JSON.parse(localStorage.getItem('bookData')); //下載loadBookData資料
+        if (validator.validate()) {
+            bookDataFromLocalStorage = JSON.parse(localStorage.getItem('bookData')); //下載loadBookData
             bookDataFromLocalStorage.push(//新增資料放入json中
                     {
-                        "BookId": Date.now(), //因為沒有記錄流水號所以使用時間當ID
+                        "BookId": Date.now(), //沒有記錄流水號所以用時間當ID
                         "BookCategory": viewModel.bookCategoryList[0].name,
                         "BookName": $("#book_name").val(),
                         "BookAuthor": $("#book_author").val(),
@@ -152,7 +162,8 @@ function find(str) {
                         "BookPrice": $("#book_price").val(),
                         "BookAmount": $("#book_amount").val(),
                         "BookTotal": $("#book_price").val() * $("#book_amount").val()
-                    }, );
+                });
+
             localStorage.setItem('bookData', JSON.stringify(bookDataFromLocalStorage)); //將所有json資料放入loadBookData
             Grid(bookDataFromLocalStorage);
             $("#window").data("kendoWindow").close();
